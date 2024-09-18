@@ -13,17 +13,17 @@ def load_data_from_csv():
 
 
 def normalize_position(data: pd.DataFrame):
-    data = pd.get_dummies(data, columns=["Pos"], dtype=int)
+    data = pd.get_dummies(data, columns=["Pos"], dtype=int, dummy_na=False)
     return data
 
 
 def normalize_team(data: pd.DataFrame):
-    data = pd.get_dummies(data, columns=["Tm"], dtype=int)
+    data = pd.get_dummies(data, columns=["Tm"], dtype=int, dummy_na=False)
     return data
 
 
 def normalize_performance(data: pd.DataFrame):
-    data = pd.get_dummies(data, columns=["Performance"], dtype=int)
+    data = pd.get_dummies(data, columns=["Performance"], dtype=int, dummy_na=False)
     return data
 
 
