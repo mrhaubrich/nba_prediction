@@ -245,7 +245,7 @@ if __name__ == "__main__":
     # Define the network architecture
     input_size = X_train.shape[1]
     output_size = y_train.shape[1]  # Number of classes
-    hidden_layer_sizes = [128, 64, 64, 16]  # Number of neurons in hidden layers
+    hidden_layer_sizes = [128, 64, 32]  # Number of neurons in hidden layers
 
     layers = [input_size] + hidden_layer_sizes + [output_size]
 
