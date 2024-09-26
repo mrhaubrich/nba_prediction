@@ -235,7 +235,7 @@ if __name__ == "__main__":
     X = X[indices]
     y = y[indices]
 
-    split_ratio = 0.8
+    split_ratio = 0.75
     split_index = int(len(X) * split_ratio)
     X_train = X[:split_index]
     y_train = y[:split_index]
@@ -245,13 +245,13 @@ if __name__ == "__main__":
     # Define the network architecture
     input_size = X_train.shape[1]
     output_size = y_train.shape[1]  # Number of classes
-    hidden_layer_sizes = [128, 64, 32]  # Number of neurons in hidden layers
+    hidden_layer_sizes = [128, 64, 64, 32]
 
     layers = [input_size] + hidden_layer_sizes + [output_size]
 
     # Create and train the MLP
     mlp = MLP(layers)
-    mlp.train(X_train, y_train, epochs=2000, learning_rate=0.001)
+    mlp.train(X_train, y_train, epochs=1000, learning_rate=0.01)
 
     # Evaluate the model on test data
     y_pred_probs = mlp.predict(X_test)
