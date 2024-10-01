@@ -27,13 +27,13 @@ def handle_missing_values(data: pd.DataFrame):
     for col in numerical_cols:
         if data[col].isna().any():
             median_value = data[col].median()
-            data[col].fillna(median_value, inplace=True)
+            data[col] = data[col].fillna(median_value)
     # Fill categorical columns with the mode
     categorical_cols = data.select_dtypes(include=["object"]).columns
     for col in categorical_cols:
         if data[col].isna().any():
             mode_value = data[col].mode()[0]
-            data[col].fillna(mode_value, inplace=True)
+            data[col] = data[col].fillna(mode_value)
     return data
 
 
@@ -52,14 +52,16 @@ def normalize_performance(data: pd.DataFrame):
     return data
 
 
-def compute_confusion_matrix(y_true, y_pred, num_classes):
+def compute_confusion_matrix(y_true, y_pred, num_classes, class_labels):
     conf_matrix = np.zeros((num_classes, num_classes), dtype=int)
     for t, p in zip(y_true, y_pred):
         conf_matrix[t][p] += 1
+    print(f"\nConfusion Matrix (Classes: {', '.join(class_labels)}):")
+    print(pd.DataFrame(conf_matrix, index=class_labels, columns=class_labels))
     return conf_matrix
 
 
-def calculate_metrics(conf_matrix):
+def calculate_metrics(conf_matrix, class_labels):
     num_classes = conf_matrix.shape[0]
     precision = np.zeros(num_classes)
     recall = np.zeros(num_classes)
@@ -76,6 +78,13 @@ def calculate_metrics(conf_matrix):
             if (precision[i] + recall[i]) > 0
             else 0.0
         )
+
+    # Print precision, recall, and F1 score for each class
+    for i, label in enumerate(class_labels):
+        print(f"\nClass '{label}':")
+        print(f"  Precision: {precision[i]:.4f}")
+        print(f"  Recall:    {recall[i]:.4f}")
+        print(f"  F1 Score:  {f1_score[i]:.4f}")
 
     return precision, recall, f1_score
 
@@ -192,7 +201,7 @@ class MLP:
 if __name__ == "__main__":
     # Load data
     data = load_data_from_csv()
-    data = data.drop(columns=["Player", "FG%.1", "Tm"])
+    data = data.drop(columns=["Player", "FG%.1"])
 
     # Identify missing values before handling
     identify_missing_values(data)
@@ -200,14 +209,17 @@ if __name__ == "__main__":
     # Handle missing values
     data = handle_missing_values(data)
 
+    # Extract class labels
+    class_labels = data["Performance"].unique()
+
     # Verify that missing values have been handled
     print("\nAfter handling missing values:")
     identify_missing_values(data)
 
     # Normalize categorical variables
     data = normalize_position(data)
-    # data = normalize_team(data)
     data = normalize_performance(data)
+    data = normalize_team(data)
 
     # Print the first few rows of the processed data
     print("\nProcessed Data:")
@@ -245,7 +257,7 @@ if __name__ == "__main__":
     # Define the network architecture
     input_size = X_train.shape[1]
     output_size = y_train.shape[1]  # Number of classes
-    hidden_layer_sizes = [128, 64, 64, 32]
+    hidden_layer_sizes = [(input_size + output_size) // 2]
 
     layers = [input_size] + hidden_layer_sizes + [output_size]
 
@@ -258,21 +270,14 @@ if __name__ == "__main__":
     y_pred_labels = np.argmax(y_pred_probs, axis=1)
     y_true_labels = np.argmax(y_test, axis=1)
 
-    # Compute confusion matrix
+    # Compute confusion matrix using custom labels
     num_classes = y_test.shape[1]
-    conf_matrix = compute_confusion_matrix(y_true_labels, y_pred_labels, num_classes)
-    print("\nConfusion Matrix:")
-    print(conf_matrix)
+    conf_matrix = compute_confusion_matrix(
+        y_true_labels, y_pred_labels, num_classes, class_labels
+    )
 
-    # Calculate metrics
-    precision, recall, f1_score = calculate_metrics(conf_matrix)
-
-    # Display metrics
-    for i in range(num_classes):
-        print(f"\nClass {i}:")
-        print(f"  Precision: {precision[i]:.4f}")
-        print(f"  Recall:    {recall[i]:.4f}")
-        print(f"  F1 Score:  {f1_score[i]:.4f}")
+    # Calculate and display metrics with custom labels
+    precision, recall, f1_score = calculate_metrics(conf_matrix, class_labels)
 
     # Overall accuracy
     test_accuracy = np.mean(y_pred_labels == y_true_labels)
