@@ -116,14 +116,12 @@ class MLP:
     def initialize_weights(self) -> None:
         """Initialize weights and biases for each layer."""
         # Initialize weights and biases using He initialization for ReLU activation
-        for i in range(len(self.layers) - 1):
-            rng = np.random.default_rng()
-            weight = rng.standard_normal(
-                (self.layers[i], self.layers[i + 1]),
-            ) * np.sqrt(
-                2 / self.layers[i],
-            )
-            bias = np.zeros((1, self.layers[i + 1]))
+        rng = np.random.default_rng()
+        for i in range(1, len(self.layers)):
+            input_size = self.layers[i - 1]
+            output_size = self.layers[i]
+            weight = rng.normal(0, np.sqrt(2 / input_size), (input_size, output_size))
+            bias = np.zeros((1, output_size))
             self.weights.append(weight)
             self.biases.append(bias)
 
@@ -211,7 +209,7 @@ class MLP:
             # Update parameters
             self.update_parameters(grads_w, grads_b, learning_rate)
             # Print loss every 10 epochs
-            if (epoch + 1) % 10 == 0 or epoch == 0:
+            if (epoch + 1) % 100 == 0 or epoch == 0:
                 print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss:.4f}")
 
     def evaluate(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
@@ -288,7 +286,7 @@ if __name__ == "__main__":
 
     # Create and train the MLP
     mlp = MLP(layers)
-    mlp.train(X_train, y_train, epochs=1000, learning_rate=0.01)
+    mlp.train(X_train, y_train, epochs=10000, learning_rate=0.01)
 
     # Evaluate the model on test data
     y_pred_probs = mlp.predict(X_test)
