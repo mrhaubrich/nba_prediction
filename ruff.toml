@@ -1,0 +1,14 @@
+target-version = "py39"
+fix = true
+src = ["var/app/"]
+extend-exclude = ["**/migrations/**"]
+
+[lint]
+select = ["ALL"]
+ignore = [
+    "TD003", # Disable TODO issue
+    "D100", # Missing docstring in public module
+    "EXE002", # Use of `exec` statement
+]
+
+fixable = ["ALL"]
