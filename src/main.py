@@ -4,13 +4,13 @@ import numpy as np
 import pandas as pd
 
 
-def load_data_from_csv():
+def load_data_from_csv() -> pd.DataFrame:
     path = Path(__file__).parent.parent / "data" / "nba_dados.csv"
     print(f"Loading data from: {path}")
     return pd.read_csv(path)
 
 
-def identify_missing_values(data: pd.DataFrame):
+def identify_missing_values(data: pd.DataFrame) -> None:
     nan_columns = data.columns[data.isna().any()].tolist()
     if nan_columns:
         print("Columns with NaN data:", nan_columns)
@@ -21,7 +21,7 @@ def identify_missing_values(data: pd.DataFrame):
         print("No missing values found.")
 
 
-def handle_missing_values(data: pd.DataFrame):
+def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
     # Fill numerical columns with the median of the column
     numerical_cols = data.select_dtypes(include=["float64", "int64"]).columns
     for col in numerical_cols:
@@ -37,22 +37,24 @@ def handle_missing_values(data: pd.DataFrame):
     return data
 
 
-def normalize_position(data: pd.DataFrame):
-    data = pd.get_dummies(data, columns=["Pos"], dtype=int, dummy_na=False)
-    return data
+def normalize_position(data: pd.DataFrame) -> pd.DataFrame:
+    return pd.get_dummies(data, columns=["Pos"], dtype=int, dummy_na=False)
 
 
-def normalize_team(data: pd.DataFrame):
-    data = pd.get_dummies(data, columns=["Tm"], dtype=int, dummy_na=False)
-    return data
+def normalize_team(data: pd.DataFrame) -> pd.DataFrame:
+    return pd.get_dummies(data, columns=["Tm"], dtype=int, dummy_na=False)
 
 
-def normalize_performance(data: pd.DataFrame):
-    data = pd.get_dummies(data, columns=["Performance"], dtype=int, dummy_na=False)
-    return data
+def normalize_performance(data: pd.DataFrame) -> pd.DataFrame:
+    return pd.get_dummies(data, columns=["Performance"], dtype=int, dummy_na=False)
 
 
-def compute_confusion_matrix(y_true, y_pred, num_classes, class_labels):
+def compute_confusion_matrix(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    num_classes: int,
+    class_labels: np.ndarray,
+) -> np.ndarray:
     conf_matrix = np.zeros((num_classes, num_classes), dtype=int)
     for t, p in zip(y_true, y_pred):
         conf_matrix[t][p] += 1
@@ -61,7 +63,7 @@ def compute_confusion_matrix(y_true, y_pred, num_classes, class_labels):
     return conf_matrix
 
 
-def calculate_metrics(conf_matrix, class_labels):
+def calculate_metrics(conf_matrix: np.ndarray, class_labels: np.ndarray) -> tuple:
     num_classes = conf_matrix.shape[0]
     precision = np.zeros(num_classes)
     recall = np.zeros(num_classes)
@@ -89,8 +91,9 @@ def calculate_metrics(conf_matrix, class_labels):
     return precision, recall, f1_score
 
 
-def compute_feature_importance(weights):
-    # Sum the absolute weights for each input feature across all neurons in the first hidden layer
+def compute_feature_importance(weights: list) -> np.ndarray:
+    # Sum the absolute weights for each input feature across all
+    # neurons in the first hidden layer
     importance = np.sum(np.abs(weights[0]), axis=1)
     # Normalize the importance scores
     importance /= np.sum(importance)
@@ -98,8 +101,11 @@ def compute_feature_importance(weights):
 
 
 class MLP:
-    def __init__(self, layers):
-        """
+    """Multi-layer Perceptron (MLP) for classification."""
+
+    def __init__(self, layers: list) -> None:
+        """Initialize the MLP with the given layer sizes.
+
         layers: list of layer sizes, e.g., [input_size, hidden1_size, ..., output_size]
         """
         self.layers = layers
@@ -107,49 +113,53 @@ class MLP:
         self.biases = []
         self.initialize_weights()
 
-    def initialize_weights(self):
+    def initialize_weights(self) -> None:
+        """Initialize weights and biases for each layer."""
         # Initialize weights and biases using He initialization for ReLU activation
         for i in range(len(self.layers) - 1):
-            weight = np.random.randn(self.layers[i], self.layers[i + 1]) * np.sqrt(
-                2 / self.layers[i]
+            rng = np.random.default_rng()
+            weight = rng.standard_normal(
+                (self.layers[i], self.layers[i + 1]),
+            ) * np.sqrt(
+                2 / self.layers[i],
             )
             bias = np.zeros((1, self.layers[i + 1]))
             self.weights.append(weight)
             self.biases.append(bias)
 
-    def relu(self, z):
+    def relu(self, z: np.ndarray) -> np.ndarray:
+        """ReLU activation function."""
         return np.maximum(0, z)
 
-    def relu_derivative(self, z):
+    def relu_derivative(self, z: np.ndarray) -> np.ndarray:
+        """Apply the derivative of the ReLU activation function."""
         return (z > 0).astype(float)
 
-    def softmax(self, z):
+    def softmax(self, z: np.ndarray) -> np.ndarray:
+        """Softmax activation function."""
         exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))  # Numerical stability
         return exp_z / np.sum(exp_z, axis=1, keepdims=True)
 
-    def forward(self, X):
+    def forward(self, X: np.ndarray) -> list:
+        """Forward pass through the network."""
         activations = [X]
-        input = X
+        _input = X
         for i in range(len(self.weights)):
-            z = np.dot(input, self.weights[i]) + self.biases[i]
-            if i == len(self.weights) - 1:
-                # Output layer with softmax activation
-                a = self.softmax(z)
-            else:
-                # Hidden layers with ReLU activation
-                a = self.relu(z)
+            z = np.dot(_input, self.weights[i]) + self.biases[i]
+            a = self.softmax(z) if i == len(self.weights) - 1 else self.relu(z)
             activations.append(a)
-            input = a
+            _input = a
         return activations
 
-    def compute_loss(self, y_true, y_pred):
+    def compute_loss(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+        """Compute the cross-entropy loss."""
         # Cross-entropy loss
         epsilon = 1e-8  # To prevent log(0)
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
-        loss = -np.sum(y_true * np.log(y_pred)) / y_true.shape[0]
-        return loss
+        return -np.sum(y_true * np.log(y_pred)) / y_true.shape[0]
 
-    def backward(self, activations, y_true):
+    def backward(self, activations: list, y_true: np.ndarray) -> tuple:
+        """Backward pass through the network to compute gradients."""
         grads_w = [0] * len(self.weights)
         grads_b = [0] * len(self.biases)
         y_pred = activations[-1]
@@ -160,20 +170,34 @@ class MLP:
             grads_b[i] = np.sum(delta, axis=0, keepdims=True) / y_true.shape[0]
             if i != 0:
                 delta = np.dot(delta, self.weights[i].T) * self.relu_derivative(
-                    activations[i]
+                    activations[i],
                 )
         return grads_w, grads_b
 
-    def update_parameters(self, grads_w, grads_b, learning_rate):
+    def update_parameters(
+        self,
+        grads_w: list,
+        grads_b: list,
+        learning_rate: float,
+    ) -> None:
+        """Update weights and biases using gradient descent."""
         for i in range(len(self.weights)):
             self.weights[i] -= learning_rate * grads_w[i]
             self.biases[i] -= learning_rate * grads_b[i]
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Make predictions using the trained model."""
         activations = self.forward(X)
         return activations[-1]
 
-    def train(self, X_train, y_train, epochs=1000, learning_rate=0.001):
+    def train(
+        self,
+        X_train: np.ndarray,
+        y_train: np.ndarray,
+        epochs: int,
+        learning_rate: float,
+    ) -> None:
+        """Train the model using mini-batch gradient descent."""
         for epoch in range(epochs):
             # Forward propagation
             activations = self.forward(X_train)
@@ -190,18 +214,18 @@ class MLP:
             if (epoch + 1) % 10 == 0 or epoch == 0:
                 print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss:.4f}")
 
-    def evaluate(self, X_test, y_test):
+    def evaluate(self, X_test: np.ndarray, y_test: np.ndarray) -> float:
+        """Evaluate the model on test data and return the accuracy."""
         y_pred = self.predict(X_test)
         y_pred_labels = np.argmax(y_pred, axis=1)
         y_true_labels = np.argmax(y_test, axis=1)
-        accuracy = np.mean(y_pred_labels == y_true_labels)
-        return accuracy
+        return np.mean(y_pred_labels == y_true_labels)
 
 
 if __name__ == "__main__":
     # Load data
     data = load_data_from_csv()
-    data = data.drop(columns=["Player", "FG%.1"])
+    data = data.drop(columns=["Player", "FG%.1", "Tm"])
 
     # Identify missing values before handling
     identify_missing_values(data)
@@ -219,7 +243,7 @@ if __name__ == "__main__":
     # Normalize categorical variables
     data = normalize_position(data)
     data = normalize_performance(data)
-    data = normalize_team(data)
+    # data = normalize_team(data)  # noqa: ERA001
 
     # Print the first few rows of the processed data
     print("\nProcessed Data:")
@@ -229,8 +253,8 @@ if __name__ == "__main__":
     performance_columns = [
         col for col in data.columns if col.startswith("Performance_")
     ]
-    X = data.drop(columns=performance_columns).values  # Features
-    y = data[performance_columns].values  # Labels (one-hot encoded)
+    X = data.drop(columns=performance_columns).to_numpy()  # Features
+    y = data[performance_columns].to_numpy()  # Labels (one-hot encoded)
 
     # Standardize features
     X_mean = X.mean(axis=0)
@@ -243,7 +267,8 @@ if __name__ == "__main__":
 
     # Shuffle and split the data
     indices = np.arange(len(X))
-    np.random.shuffle(indices)
+    rng = np.random.default_rng()
+    rng.shuffle(indices)
     X = X[indices]
     y = y[indices]
 
@@ -259,7 +284,7 @@ if __name__ == "__main__":
     output_size = y_train.shape[1]  # Number of classes
     hidden_layer_sizes = [(input_size + output_size) // 2]
 
-    layers = [input_size] + hidden_layer_sizes + [output_size]
+    layers = [input_size, *hidden_layer_sizes, output_size]
 
     # Create and train the MLP
     mlp = MLP(layers)
@@ -273,7 +298,10 @@ if __name__ == "__main__":
     # Compute confusion matrix using custom labels
     num_classes = y_test.shape[1]
     conf_matrix = compute_confusion_matrix(
-        y_true_labels, y_pred_labels, num_classes, class_labels
+        y_true_labels,
+        y_pred_labels,
+        num_classes,
+        class_labels,
     )
 
     # Calculate and display metrics with custom labels
@@ -287,7 +315,9 @@ if __name__ == "__main__":
     feature_importance = compute_feature_importance(mlp.weights)
     feature_names = data.drop(columns=performance_columns).columns
     sorted_features = sorted(
-        zip(feature_names, feature_importance), key=lambda x: x[1], reverse=True
+        zip(feature_names, feature_importance),
+        key=lambda x: x[1],
+        reverse=True,
     )
     print("\nTop 10 Features Contributing to the Model:")
     for feature, importance in sorted_features[:10]:

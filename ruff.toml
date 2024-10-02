@@ -9,6 +9,10 @@ ignore = [
     "TD003", # Disable TODO issue
     "D100", # Missing docstring in public module
     "EXE002", # Use of `exec` statement
+    "D103",
+    "T201",
+    "N806",
+    "N803",
 ]
 
 fixable = ["ALL"]
