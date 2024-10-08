@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import classification_report, confusion_matrix
 
 
 def load_data_from_csv() -> pd.DataFrame:
@@ -52,15 +53,16 @@ def normalize_performance(data: pd.DataFrame) -> pd.DataFrame:
 def compute_confusion_matrix(
     y_true: np.ndarray,
     y_pred: np.ndarray,
-    num_classes: int,
     class_labels: np.ndarray,
 ) -> np.ndarray:
-    conf_matrix = np.zeros((num_classes, num_classes), dtype=int)
-    for t, p in zip(y_true, y_pred):
-        conf_matrix[t][p] += 1
-    print(f"\nConfusion Matrix (Classes: {', '.join(class_labels)}):")
-    print(pd.DataFrame(conf_matrix, index=class_labels, columns=class_labels))
-    return conf_matrix
+    cm = confusion_matrix(y_true, y_pred)
+
+    # Create a DataFrame for the confusion matrix
+    cm_df = pd.DataFrame(cm, index=class_labels, columns=class_labels)
+    print("\nConfusion Matrix:")
+    print(cm_df)
+
+    return cm
 
 
 def calculate_metrics(conf_matrix: np.ndarray, class_labels: np.ndarray) -> tuple:
@@ -286,7 +288,7 @@ if __name__ == "__main__":
 
     # Create and train the MLP
     mlp = MLP(layers)
-    mlp.train(X_train, y_train, epochs=10000, learning_rate=0.01)
+    mlp.train(X_train, y_train, epochs=1000, learning_rate=0.01)
 
     # Evaluate the model on test data
     y_pred_probs = mlp.predict(X_test)
@@ -298,16 +300,18 @@ if __name__ == "__main__":
     conf_matrix = compute_confusion_matrix(
         y_true_labels,
         y_pred_labels,
-        num_classes,
         class_labels,
     )
 
-    # Calculate and display metrics with custom labels
-    precision, recall, f1_score = calculate_metrics(conf_matrix, class_labels)
+    # Print classification report
+    class_report = classification_report(
+        y_true_labels,
+        y_pred_labels,
+        target_names=class_labels,
+    )
 
-    # Overall accuracy
-    test_accuracy = np.mean(y_pred_labels == y_true_labels)
-    print(f"\nTest Accuracy: {test_accuracy:.4f}")
+    print("\nClassification Report:")
+    print(class_report)
 
     # Feature importance
     feature_importance = compute_feature_importance(mlp.weights)
@@ -317,6 +321,7 @@ if __name__ == "__main__":
         key=lambda x: x[1],
         reverse=True,
     )
+
     print("\nTop 10 Features Contributing to the Model:")
     for feature, importance in sorted_features[:10]:
         print(f"{feature}: {importance:.4f}")
