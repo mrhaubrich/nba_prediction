@@ -56,7 +56,7 @@ if __name__ == "__main__":
     data = handle_missing_values(data)
 
     # Extract labels before normalization
-    labels = data["Performance"].values  # Labels as strings or categories
+    labels = data["Performance"].to_numpy()  # Labels as strings or categories
 
     # Encode labels to integers
     le = LabelEncoder()
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     rng = np.random.default_rng()
     rng.shuffle(indices)
     X = X[indices]
-    y_labels = y_labels[indices]
+    y_labels = np.array(y_labels)[indices]
 
     split_ratio = 0.75
     split_index = int(len(X) * split_ratio)
@@ -147,7 +147,8 @@ if __name__ == "__main__":
     print(f"\nTest Accuracy: {test_accuracy:.4f}")
 
     # Feature importance
-    # Sum the absolute weights for each input feature across all neurons in the first hidden layer
+    # Sum the absolute weights for each input feature
+    # across all neurons in the first hidden layer
     importance = np.sum(np.abs(mlp.coefs_[0]), axis=1)
     # Normalize the importance scores
     importance /= np.sum(importance)
