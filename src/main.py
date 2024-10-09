@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import auc, classification_report, confusion_matrix, roc_curve
 
 
 def load_data_from_csv() -> pd.DataFrame:
@@ -222,13 +222,39 @@ class MLP:
         return np.mean(y_pred_labels == y_true_labels)
 
 
+def calculate_specificity(num_classes: int, conf_matrix: np.ndarray) -> np.ndarray:
+    """Calculate specificity for each class."""
+    especificidade = np.zeros(num_classes)
+    for i in range(num_classes):
+        TN = (
+            np.sum(conf_matrix)
+            - np.sum(conf_matrix[i, :])
+            - np.sum(conf_matrix[:, i])
+            + conf_matrix[i, i]
+        )
+        FP = np.sum(conf_matrix[:, i]) - conf_matrix[i, i]
+        especificidade[i] = TN / (TN + FP) if (TN + FP) > 0 else 0.0
+    return especificidade
+
+
+def calculate_roc_curve(y_true: np.ndarray, y_pred: np.ndarray) -> tuple:
+    """Calculate the Receiver Operating Characteristic (ROC) curve."""
+    fpr = {}
+    tpr = {}
+    roc_auc = {}
+    for i in range(num_classes):
+        fpr[i], tpr[i], _ = roc_curve(y_true[:, i], y_pred[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+    return fpr, tpr, roc_auc
+
+
 if __name__ == "__main__":
     # Load data
     data = load_data_from_csv()
     data = data.drop(columns=["Player", "FG%.1", "Tm"])
 
     # Identify missing values before handling
-    identify_missing_values(data)
+    # identify_missing_values(data)
 
     # Handle missing values
     data = handle_missing_values(data)
@@ -237,8 +263,8 @@ if __name__ == "__main__":
     class_labels = data["Performance"].unique()
 
     # Verify that missing values have been handled
-    print("\nAfter handling missing values:")
-    identify_missing_values(data)
+    # print("\nAfter handling missing values:")
+    # identify_missing_values(data)
 
     # Normalize categorical variables
     data = normalize_position(data)
@@ -246,8 +272,8 @@ if __name__ == "__main__":
     # data = normalize_team(data)  # noqa: ERA001
 
     # Print the first few rows of the processed data
-    print("\nProcessed Data:")
-    print(data.head())
+    # print("\nProcessed Data:")
+    # print(data.head())
 
     # Extract features and labels
     performance_columns = [
@@ -262,8 +288,8 @@ if __name__ == "__main__":
     X = (X - X_mean) / X_std
 
     # Check for NaNs in X and y
-    print(f"\nNumber of NaNs in X: {np.isnan(X).sum()}")
-    print(f"Number of NaNs in y: {np.isnan(y).sum()}")
+    # print(f"\nNumber of NaNs in X: {np.isnan(X).sum()}")
+    # print(f"Number of NaNs in y: {np.isnan(y).sum()}")
 
     # Shuffle and split the data
     indices = np.arange(len(X))
@@ -325,3 +351,19 @@ if __name__ == "__main__":
     print("\nTop 10 Features Contributing to the Model:")
     for feature, importance in sorted_features[:10]:
         print(f"{feature}: {importance:.4f}")
+
+    # calcular especificidade
+    especificidade = calculate_specificity(num_classes, conf_matrix)
+
+    # Print especificidade for each class
+    for i, label in enumerate(class_labels):
+        print(f"\nClass '{label}':")
+        print(f"  Especificidade: {especificidade[i]:.4f}")
+
+    # Calculate ROC curve
+    fpr, tpr, roc_auc = calculate_roc_curve(y_test, y_pred_probs)
+
+    # Print ROC AUC for each class
+    for i, label in enumerate(class_labels):
+        print(f"\nClass '{label}':")
+        print(f"  ROC AUC: {roc_auc[i]:.4f}")
