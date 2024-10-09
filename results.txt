@@ -1,0 +1,260 @@
+Loading data from: /home/marhaubrich/git/nba_prediction/data/nba_dados.csv
+Epoch 1/1000, Loss: 1.0231
+Epoch 100/1000, Loss: 0.2404
+Epoch 200/1000, Loss: 0.1762
+Epoch 300/1000, Loss: 0.1476
+Epoch 400/1000, Loss: 0.1289
+Epoch 500/1000, Loss: 0.1151
+Epoch 600/1000, Loss: 0.1043
+Epoch 700/1000, Loss: 0.0956
+Epoch 800/1000, Loss: 0.0885
+Epoch 900/1000, Loss: 0.0824
+Epoch 1000/1000, Loss: 0.0771
+
+Confusion Matrix:
+      Bad  Good
+Bad   140     1
+Good    3    12
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         Bad       0.98      0.99      0.99       141
+        Good       0.92      0.80      0.86        15
+
+    accuracy                           0.97       156
+   macro avg       0.95      0.90      0.92       156
+weighted avg       0.97      0.97      0.97       156
+
+
+Top 10 Features Contributing to the Model:
+AST: 0.0451
+G: 0.0402
+FT: 0.0377
+PTS: 0.0371
+Age: 0.0362
+Pos_SF-SG: 0.0361
+PF: 0.0345
+3P: 0.0323
+Pos_SG: 0.0316
+FT%: 0.0315
+
+Class 'Bad':
+  Especificidade: 0.8000
+
+Class 'Good':
+  Especificidade: 0.9929
+
+Class 'Bad':
+  ROC AUC: 0.9948
+
+Class 'Good':
+  ROC AUC: 0.9948
+Loading data from: /home/marhaubrich/git/nba_prediction/data/nba_dados.csv
+Epoch 1/1000, Loss: 1.8240
+Epoch 100/1000, Loss: 0.2954
+Epoch 200/1000, Loss: 0.1951
+Epoch 300/1000, Loss: 0.1542
+Epoch 400/1000, Loss: 0.1304
+Epoch 500/1000, Loss: 0.1138
+Epoch 600/1000, Loss: 0.1013
+Epoch 700/1000, Loss: 0.0918
+Epoch 800/1000, Loss: 0.0845
+Epoch 900/1000, Loss: 0.0785
+Epoch 1000/1000, Loss: 0.0736
+
+Confusion Matrix:
+      Bad  Good
+Bad   144     2
+Good    4     6
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         Bad       0.97      0.99      0.98       146
+        Good       0.75      0.60      0.67        10
+
+    accuracy                           0.96       156
+   macro avg       0.86      0.79      0.82       156
+weighted avg       0.96      0.96      0.96       156
+
+
+Top 10 Features Contributing to the Model:
+TOV: 0.0391
+DRB: 0.0390
+Pos_SG: 0.0359
+Pos_SG-PG: 0.0358
+eFG%: 0.0356
+3PA: 0.0329
+Pos_C: 0.0328
+Pos_PF-SF: 0.0322
+BLK: 0.0318
+G: 0.0317
+
+Class 'Bad':
+  Especificidade: 0.6000
+
+Class 'Good':
+  Especificidade: 0.9863
+
+Class 'Bad':
+  ROC AUC: 0.9849
+
+Class 'Good':
+  ROC AUC: 0.9849
+Loading data from: /home/marhaubrich/git/nba_prediction/data/nba_dados.csv
+Epoch 1/1000, Loss: 0.5208
+Epoch 100/1000, Loss: 0.2475
+Epoch 200/1000, Loss: 0.1850
+Epoch 300/1000, Loss: 0.1549
+Epoch 400/1000, Loss: 0.1360
+Epoch 500/1000, Loss: 0.1230
+Epoch 600/1000, Loss: 0.1133
+Epoch 700/1000, Loss: 0.1056
+Epoch 800/1000, Loss: 0.0992
+Epoch 900/1000, Loss: 0.0939
+Epoch 1000/1000, Loss: 0.0892
+
+Confusion Matrix:
+      Bad  Good
+Bad   139     3
+Good    3    11
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         Bad       0.98      0.98      0.98       142
+        Good       0.79      0.79      0.79        14
+
+    accuracy                           0.96       156
+   macro avg       0.88      0.88      0.88       156
+weighted avg       0.96      0.96      0.96       156
+
+
+Top 10 Features Contributing to the Model:
+FGA: 0.0413
+eFG%: 0.0411
+3P: 0.0387
+Pos_PG: 0.0372
+Pos_PF-SF: 0.0365
+FG%: 0.0352
+G: 0.0346
+MP: 0.0340
+2PA: 0.0324
+FTA: 0.0323
+
+Class 'Bad':
+  Especificidade: 0.7857
+
+Class 'Good':
+  Especificidade: 0.9789
+
+Class 'Bad':
+  ROC AUC: 0.9884
+
+Class 'Good':
+  ROC AUC: 0.9884
+Loading data from: /home/marhaubrich/git/nba_prediction/data/nba_dados.csv
+Epoch 1/1000, Loss: 0.9146
+Epoch 100/1000, Loss: 0.2028
+Epoch 200/1000, Loss: 0.1490
+Epoch 300/1000, Loss: 0.1251
+Epoch 400/1000, Loss: 0.1103
+Epoch 500/1000, Loss: 0.0998
+Epoch 600/1000, Loss: 0.0914
+Epoch 700/1000, Loss: 0.0847
+Epoch 800/1000, Loss: 0.0793
+Epoch 900/1000, Loss: 0.0748
+Epoch 1000/1000, Loss: 0.0710
+
+Confusion Matrix:
+      Bad  Good
+Bad   145     2
+Good    3     6
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         Bad       0.98      0.99      0.98       147
+        Good       0.75      0.67      0.71         9
+
+    accuracy                           0.97       156
+   macro avg       0.86      0.83      0.84       156
+weighted avg       0.97      0.97      0.97       156
+
+
+Top 10 Features Contributing to the Model:
+MP: 0.0394
+GS: 0.0363
+FT: 0.0361
+2P: 0.0351
+3P%: 0.0351
+Pos_SF-SG: 0.0350
+AST: 0.0333
+FG%: 0.0331
+eFG%: 0.0330
+STL: 0.0319
+
+Class 'Bad':
+  Especificidade: 0.6667
+
+Class 'Good':
+  Especificidade: 0.9864
+
+Class 'Bad':
+  ROC AUC: 0.9932
+
+Class 'Good':
+  ROC AUC: 0.9932
+Loading data from: /home/marhaubrich/git/nba_prediction/data/nba_dados.csv
+Epoch 1/1000, Loss: 1.3941
+Epoch 100/1000, Loss: 0.2290
+Epoch 200/1000, Loss: 0.1622
+Epoch 300/1000, Loss: 0.1341
+Epoch 400/1000, Loss: 0.1171
+Epoch 500/1000, Loss: 0.1051
+Epoch 600/1000, Loss: 0.0962
+Epoch 700/1000, Loss: 0.0891
+Epoch 800/1000, Loss: 0.0833
+Epoch 900/1000, Loss: 0.0784
+Epoch 1000/1000, Loss: 0.0741
+
+Confusion Matrix:
+      Bad  Good
+Bad   141     3
+Good    1    11
+
+Classification Report:
+              precision    recall  f1-score   support
+
+         Bad       0.99      0.98      0.99       144
+        Good       0.79      0.92      0.85        12
+
+    accuracy                           0.97       156
+   macro avg       0.89      0.95      0.92       156
+weighted avg       0.98      0.97      0.98       156
+
+
+Top 10 Features Contributing to the Model:
+Pos_C: 0.0404
+3P%: 0.0389
+Pos_PF-SF: 0.0385
+ORB: 0.0382
+PTS: 0.0368
+Pos_SG-PG: 0.0357
+FGA: 0.0356
+Pos_PG: 0.0353
+Pos_SF: 0.0342
+FT%: 0.0325
+
+Class 'Bad':
+  Especificidade: 0.9167
+
+Class 'Good':
+  Especificidade: 0.9792
+
+Class 'Bad':
+  ROC AUC: 0.9821
+
+Class 'Good':
+  ROC AUC: 0.9821
